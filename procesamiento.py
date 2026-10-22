@@ -13,9 +13,6 @@ def calcular_estadisticas_globales(
             - ping_promedio: promedio de ping
             - duracion_promedio: duración promedio en minutos
             - porcentaje_competitivas: porcentaje de partidas competitivas
-
-    Raises:
-        AssertionError: Si la lista de sesiones está vacía.
     """
     _total = _calcular_total_sesiones(sesiones) #Necesario para DRY
     assert _total > 0, (
@@ -24,10 +21,21 @@ def calcular_estadisticas_globales(
     )   #Considerar raise ValueError
 
     return {
-        "total_sesiones": _calculcar_total_sesiones(sesiones),
-        "ping_promedio": _calcular_valor_avg(sesiones, "ping_promedio"),
-        "duracion_promedio": _calcular_valor_avg(sesiones, "duracion_minutos"),
-        "porcentaje_competitivas": _calcular_procentaje_competitivas(sesiones)
+        "total_sesiones": _total,
+
+        "ping_promedio": _calcular_valor_avg(
+            sesiones,
+            "ping_promedio",
+            _total),
+
+        "duracion_promedio": _calcular_valor_avg(
+            sesiones,
+            "duracion_minutos",
+            _total),
+
+        "porcentaje_competitivas": _calcular_porcentaje_competitivas(
+            sesiones,
+            _total)
     }
 
 def _calcular_total_sesiones(sesiones: list[dict]) -> int:
@@ -46,10 +54,15 @@ def _calcular_valor_avg(
 
     return round(suma / total, 2)
 
-def _calcular_procentaje_competitivas(sesiones):
-    total = _calculcar_total_sesiones(sesiones)
+def _calcular_porcentaje_competitivas(
+        sesiones: list[dict],
+        total: int) -> float:
+    """Calcula el porcentaje de partidas competitivas
+    (o no-Casuales)."""
     competitivas = total - _calcular_partidas_casuales(sesiones)
     return (competitivas / total) * 100
+    # Regla de 3: (x / p) = Relación x contra población. 
+    # Relación * 100 = repr a porcentaje.
 
 def _calcular_partidas_casuales(sesiones: list[dict]) -> int:
     """Cuenta el número de partidas casuales en las sesiones."""
