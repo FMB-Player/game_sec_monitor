@@ -34,11 +34,16 @@ def _calcular_total_sesiones(sesiones: list[dict]) -> int:
     """Calcula el total de sesiones en la lista."""
     return len(sesiones)
 
-def _calcular_valor_avg(sesiones:list[dict], clave:str) -> float:
-    total = _calculcar_total_sesiones(sesiones)
-    suma = 0
-    for registro in sesiones:
-        suma += registro.get(clave)
+def _calcular_valor_avg(
+        sesiones: list[dict],
+        clave: str,
+        total: int) -> float:
+    """Calcula el valor promedio de una clave específica en las sesiones. Redondea a 2 decimales."""
+    suma = sum(
+        registro.get(clave, 0)
+        for registro in sesiones
+    )
+
     return round(suma / total, 2)
 
 def _calcular_procentaje_competitivas(sesiones):
@@ -46,9 +51,10 @@ def _calcular_procentaje_competitivas(sesiones):
     competitivas = total - _calcular_partidas_casuales(sesiones)
     return (competitivas / total) * 100
 
-def _calcular_partidas_casuales(sesiones:list[dict]) -> int:
-    casuales = 0
-    for registro in sesiones:
-        if registro.get("tipo_partida") == "Casual":
-            casuales +=1
-    return casuales
+def _calcular_partidas_casuales(sesiones: list[dict]) -> int:
+    """Cuenta el número de partidas casuales en las sesiones."""
+    return sum(
+        1
+        for registro in sesiones
+        if registro.get("tipo_partida") == "Casual"
+    )
