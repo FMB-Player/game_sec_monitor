@@ -1,6 +1,23 @@
 def analizar_por_servidor(
     sesiones: list[dict[str, int | float]]
 ) -> dict[str, dict[str, int | float]]:
+    """Analiza sesiones de juego por servidor.
+
+    Procesa una lista de registros de sesiones, agrupándolos por el servidor
+    donde se jugaron. Para cada servidor calcula el promedio de ping y FPS,
+    además de mantener el conteo de sesiones.
+
+    Args:
+        sesiones: Lista de diccionarios donde cada diccionario representa
+        una sesión de juego.
+
+    Returns:
+        Diccionario donde las claves son nombres de servidores y los valores
+        son diccionarios con:
+        - "cantidad": Número de sesiones en ese servidor (int)
+        - "ping_promedio": Promedio de ping de todas las sesiones (float)
+        - "fps_promedio": Promedio de FPS de todas las sesiones (float)
+    """
     acumulador: dict[str, dict[str, int | float]] = {}
 
     for registro in sesiones:
@@ -32,6 +49,7 @@ def _calcular_promedio(sumatoria: float, cantidad: int) -> float:
 def _calcular_promedios_por_servidor(
     acumulador: dict[str, dict[str, int | float]]
 ) -> dict[str, dict[str, float | int]]:
+    """Calcula los promedios de ping y FPS por servidor."""
     resultado: dict[str, dict[str, float | int]] = {}
     for servidor, datos in acumulador.items():
         cantidad = datos["cantidad"]
