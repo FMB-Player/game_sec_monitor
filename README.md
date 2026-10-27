@@ -109,12 +109,10 @@ El reporte generado (`reporte_gamesec.txt`) incluye:
 - Docstrings en todas las funciones públicas
 - Type hints en parámetros y retornos
 
-<!-- ### Equipo de desarrollo
+### Equipo de desarrollo
 
 - Balella, Franco Matías 
 
 - Maidana, Federico
 
 - Vera, Elias
-
-No me sé sus nombre completos - FMB -->
