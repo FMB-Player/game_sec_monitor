@@ -60,7 +60,7 @@ def _calcular_porcentaje_competitivas(
     """Calcula el porcentaje de partidas competitivas
     (o no-Casuales)."""
     competitivas = total - _calcular_partidas_casuales(sesiones)
-    return round(competitivas / total) * 100
+    return round((competitivas / total) * 100, 2)
     # Regla de 3: (x / p) = Relación x contra población. 
     # Relación * 100 = repr a porcentaje.
 
