@@ -1,4 +1,4 @@
-from time import sleep
+
 from carga import cargar_telemetria
 from procesamiento import (
     calcular_estadisticas_globales,
@@ -208,13 +208,11 @@ def main() -> None:
             case 6:
                 # Salir
                 print("Bye bye!")
-                sleep(1)
                 break
 
             case _:
                 print("Opción no válida")
 
-        sleep(1)
 
 
 if __name__ == "__main__":
