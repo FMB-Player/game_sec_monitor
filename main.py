@@ -1,4 +1,3 @@
-
 from carga import cargar_telemetria
 from procesamiento import (
     calcular_estadisticas_globales,
@@ -20,7 +19,7 @@ def _menu_prompt() -> int:
 
 def _generar_menu() -> tuple[str, str]:
     divisor: str = "=" * 41
-    title: str = "GAMESEC MONITOR - PANEL DE CONTROL".center(len(divisor))
+    title: str = "GAMESEC MONITOR - PANEL DE CONTROL"
     options: list[str] = [
         "1. Cargar y validar dataset",
         "2. Ver estadísticas globales de servidores",
@@ -29,7 +28,15 @@ def _generar_menu() -> tuple[str, str]:
         "5. Exportar reporte consolidado (reporte_gamesec.txt)",
         "6. Salir",
     ]
-    input_text: str = "Seleccione una opción: "
+    input_text: str = "Seleccione una opción:"
+
+    LINE_LEN: int = max(len(x) for x in (options, divisor, title, input_text))
+
+    divisor = divisor.center(LINE_LEN)
+    title = title.center(LINE_LEN)
+    options = [option.center(LINE_LEN) for option in options]
+
+    input_text = input_text.center(LINE_LEN).rstrip() + " "
 
     return "\n".join([divisor, title, divisor, *options, divisor]), input_text
 
@@ -212,7 +219,6 @@ def main() -> None:
 
             case _:
                 print("Opción no válida")
-
 
 
 if __name__ == "__main__":
