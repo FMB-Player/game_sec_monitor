@@ -115,6 +115,6 @@ El reporte generado (`reporte_gamesec.txt`) incluye:
 
 - Maidana, Federico
 
-- Integrante 3
+- Vera, Elias
 
 No me sé sus nombre completos - FMB -->
