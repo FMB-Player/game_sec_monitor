@@ -1,3 +1,4 @@
+from os.path import exists
 from time import sleep, strftime  # No se puede evitar.
 # No se puede obtener la fecha desde os.
 # Y si vamos a usar esto, ¿Por qué no también sleep?
@@ -32,7 +33,7 @@ def _generar_menu() -> tuple[str, str]:
     ]
     input_text: str = "Seleccione una opción:"
 
-    LINE_LEN: int = max(len(x) for x in (options, divisor, title, input_text))
+    LINE_LEN: int = max(len(x) for x in options + [divisor, title, input_text])
 
     divisor = divisor.center(LINE_LEN)
     title = title.center(LINE_LEN)
@@ -43,13 +44,8 @@ def _generar_menu() -> tuple[str, str]:
     return "\n".join([divisor, title, divisor, *options, divisor]), input_text
 
 
-def _format_scroll(text: str) -> str:
-    """Centra el texto en 120 caracteres."""
-    return text.center(120)
-
-
-DIVIDER = _format_scroll("=" * 70 + "\n")
-SUBDIVIDER = _format_scroll("-" * 70 + "\n")
+DIVIDER = "=" * 70 + "\n"
+SUBDIVIDER = "-" * 70 + "\n"
 
 
 def exportar_reporte(
@@ -81,17 +77,13 @@ def exportar_reporte(
 def _escribir_encabezado(archivo: TextIO) -> None:
     """Escribe el encabezado del reporte."""
     archivo.write(DIVIDER)
-    archivo.write(
-        _format_scroll("REPORTE DE AUDITORÍA Y TELEMETRÍA — GAMESEC\n")
-    )
+    archivo.write("REPORTE DE AUDITORÍA Y TELEMETRÍA — GAMESEC\n")
     archivo.write(DIVIDER)
-    archivo.write(
-        _format_scroll(f"Fecha de generación: {strftime('%d/%m/%Y')}\n\n")
-    )
+    archivo.write(f"Fecha de generación: {strftime('%d/%m/%Y')}\n\n")
 
 def _escribir_resumen_operativo(archivo: TextIO, stats: dict) -> None:
     """Escribe el resumen global operativo del reporte."""
-    archivo.write(_format_scroll("[1] RESUMEN GLOBAL OPERATIVO\n"))
+    archivo.write("[1] RESUMEN GLOBAL OPERATIVO\n")
     archivo.write(SUBDIVIDER)
 
     total_sesiones = stats.get("total_sesiones")
@@ -99,37 +91,30 @@ def _escribir_resumen_operativo(archivo: TextIO, stats: dict) -> None:
     duracion_promedio = stats.get("duracion_promedio")
     porcentaje_competitivas = stats.get("porcentaje_competitivas")
 
-    archivo.write(_format_scroll(
-        "Total de sesiones procesadas: "
-        f"{total_sesiones}\n"))
-    archivo.write(_format_scroll(
-        "Ping promedio global: "
-        f"{ping_promedio}ms\n"))
-    archivo.write(_format_scroll(
-        "Duración media de partida: "
-        f"{duracion_promedio}min\n"))
-    archivo.write(_format_scroll(
-        "Partidas de alta competencia (Ranked/Torneo): "
-        f"{porcentaje_competitivas}%\n\n")
+    archivo.write(f"Total de sesiones procesadas: {total_sesiones}\n")
+    archivo.write(f"Ping promedio global: {ping_promedio}ms\n")
+    archivo.write(f"Duración media de partida: {duracion_promedio}min\n")
+    archivo.write(
+        f"Partidas de alta competencia (Ranked/Torneo): "
+        f"{porcentaje_competitivas}%\n\n"
     )
 
 
 def _escribir_rendimiento_regional(archivo: TextIO, servidores: dict) -> None:
     """Escribe el rendimiento regional por servidor."""
-    archivo.write(_format_scroll("[2] RENDIMIENTO REGIONAL POR SERVIDOR\n"))
+    archivo.write("[2] RENDIMIENTO REGIONAL POR SERVIDOR\n")
     archivo.write(SUBDIVIDER)
-    archivo.write(_format_scroll(
-        "Servidor           | Sesiones | Ping Promedio | FPS Promedio\n"))
+    archivo.write(
+        "Servidor           | Sesiones | Ping Promedio | FPS Promedio\n"
+    )
     archivo.write(SUBDIVIDER)
     for servidor, datos in servidores.items():
         cantidad = datos.get("cantidad")
         ping_srv = datos.get("ping_promedio")
         fps_srv = datos.get("fps_promedio")
         archivo.write(
-            _format_scroll(
-                f"{servidor:<18} | {cantidad:<8} | "
-                f"{ping_srv:.2f} ms      | {fps_srv:.2f} fps\n"
-            )
+            f"{servidor:<18} | {cantidad:<8} | "
+            f"{ping_srv:>10.2f} ms | {fps_srv:>6.2f} fps\n"
         )
     archivo.write("\n")
 
@@ -138,9 +123,9 @@ def _escribir_auditoria_seguridad(
     archivo: TextIO, frecuencias: dict, criticos: list, total_sesiones: int
 ) -> None:
     """Escribe la auditoría de seguridad e incidentes."""
-    archivo.write(_format_scroll("[3] AUDITORÍA DE SEGURIDAD E INCIDENTES\n"))
+    archivo.write("[3] AUDITORÍA DE SEGURIDAD E INCIDENTES\n")
     archivo.write(SUBDIVIDER)
-    archivo.write(_format_scroll("Distribución de estados de seguridad:\n"))
+    archivo.write("Distribución de estados de seguridad:\n")
 
     normal = frecuencias.get("Normal")
     sospechoso = frecuencias.get("Sospechoso")
@@ -150,61 +135,53 @@ def _escribir_auditoria_seguridad(
     porc_sospechoso = round(sospechoso * 100 / total_sesiones, 2)
     porc_critico = round(critico * 100 / total_sesiones, 2)
 
-    archivo.write(_format_scroll(
-        f"  • Normales:    {normal} sesiones ({porc_normal}%)\n"))
-    archivo.write(_format_scroll(
-        f"  • Sospechosos: {sospechoso} sesiones ({porc_sospechoso}%)\n"))
-    archivo.write(_format_scroll(
-        f"  • Críticos:    {critico} sesiones ({porc_critico}%)\n\n"))
+    archivo.write(f"  • Normales:    {normal} sesiones ({porc_normal}%)\n")
+    archivo.write(
+        f"  • Sospechosos: {sospechoso} sesiones ({porc_sospechoso}%)\n"
+    )
+    archivo.write(f"  • Críticos:    {critico} sesiones ({porc_critico}%)\n\n")
 
-    archivo.write(_format_scroll("Detalle de Sesiones Críticas Detectadas:\n"))
+    archivo.write("Detalle de Sesiones Críticas Detectadas:\n")
     for evento in criticos:
         id_sesion = evento.get("id_sesion")
         jugador_id = evento.get("jugador_id")
         servidor = evento.get("servidor")
         motivo = evento.get("motivo")
         archivo.write(
-            _format_scroll(
-                f"  [!] Sesión #{id_sesion:<3} | "
-                f"Jugador: {jugador_id} | Servidor: {servidor}\n"
-            )
+            f"  [!] Sesión #{id_sesion:<3} | "
+            f"Jugador: {jugador_id} | Servidor: {servidor}\n"
         )
-        archivo.write(_format_scroll(f"      Motivo: {motivo}\n"))
+        archivo.write(f"      Motivo: {motivo}\n")
     archivo.write("\n")
 
 
 def _escribir_conclusiones(archivo: TextIO) -> None:
     """Escribe las conclusiones técnicas del equipo."""
-    archivo.write(_format_scroll("[4] CONCLUSIONES TÉCNICAS DEL EQUIPO\n"))
+    archivo.write("[4] CONCLUSIONES TÉCNICAS DEL EQUIPO\n")
     archivo.write(SUBDIVIDER)
-    archivo.write(_format_scroll("1. ...\n"))
-
-
-    archivo.write(_format_scroll(
-        "2. El diseño modular del sistema separa la lógica de carga,\n"
-    ))
-    archivo.write(_format_scroll(
-        "procesamiento y presentación, facilitando el mantenimiento\n"
-    ))
-    archivo.write(_format_scroll(
+    archivo.write(
+        "1. El análisis de latencia muestra que los servidores "
+        "sudamericanos (SaoPaulo: 64.07ms, BuenosAires: 78.95ms) "
+        "tienen el mejor rendimiento, lo que sugiere que la "
+        "infraestructura está centrada en Sudamérica. Las "
+        "comunicaciones hacia Europa y Norteamérica presentan "
+        "latencias significativamente mayores (Frankfurt: 199.07ms, "
+        "Virginia: 228.31ms), lo cual es consistente con la distancia "
+        "física entre regiones.\n"
+    )
+    archivo.write(
+        "2. El diseño modular del sistema separa la lógica de carga, "
+        "procesamiento y presentación, facilitando el mantenimiento "
         "y la escalabilidad del código.\n"
-    ))
-
-
-    archivo.write(_format_scroll(
-        "3. El programa procesa los registros de la base de manera eficaz,\n"
-    ))
-    archivo.write(_format_scroll(
-        "pero podría contar con try catch y excepciones,\n"
-    ))
-    archivo.write(_format_scroll(
-        "importar otros módulos como TypedDict y usar más archivos para\n"
-    ))
-    archivo.write(_format_scroll(
+    )
+    archivo.write(
+        "3. El programa procesa los registros de la base de manera eficaz, "
+        "pero podría contar con try catch y excepciones, "
+        "importar otros módulos como TypedDict y usar más archivos para "
         "partir main de UI.\n"
-    ))
+    )
     archivo.write(DIVIDER)
-    archivo.write(_format_scroll("FIN DEL REPORTE GAMESEC\n"))
+    archivo.write("FIN DEL REPORTE GAMESEC\n")
     archivo.write(DIVIDER)
 
 
@@ -224,11 +201,14 @@ def main() -> None:
         match select:
             case "1":
                 # Cargar y validar dataset
-                sesiones = cargar_telemetria("gamesec_logs.csv")
-                print(
-                    f"Se cargaron {len(sesiones)} sesiones correctamente\n"
-                    "Ahora se pueden procesar los datos."
-                )
+                if not exists("gamesec_logs.csv"):
+                    print("Error: El archivo 'gamesec_logs.csv' no existe.")
+                else:
+                    sesiones = cargar_telemetria("gamesec_logs.csv")
+                    print(
+                        f"Se cargaron {len(sesiones)} sesiones correctamente\n"
+                        "Ahora se pueden procesar los datos."
+                    )
 
             case "2":
                 # Ver estadísticas globales de servidores
@@ -246,8 +226,9 @@ def main() -> None:
                         f"Duracion promedio de partidas: "
                         f"{duracion_promedio} min, "
                         f"Porcentaje de partidas competitivas: "
-                        f"{porcentaje_competitivas}%"
+                        f"{porcentaje_competitivas:.2f}%"
                     )
+                    input() # Pausa para leer
 
             case "3":
                 # Ver rendimiento por región de servidor
@@ -263,6 +244,7 @@ def main() -> None:
                             f"Ping promedio: {ping_promedio} ms | "
                             f"FPS Promedio: {fps_promedio} fps"
                         )
+                    input() # Pausa para leer
 
             case "4":
                 # Auditar incidentes de seguridad (Críticos y Sospechosos)
@@ -286,6 +268,7 @@ def main() -> None:
                             f"del servidor {servidor} fue puesto en la "
                             f"clasificación crítico por motivo: {motivo}"
                         )
+                    input() # Pausa para leer
 
             case "5":
                 # Exportar reporte consolidado (reporte_gamesec.txt)
