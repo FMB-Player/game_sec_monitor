@@ -113,7 +113,7 @@ El reporte generado (`reporte_gamesec.txt`) incluye:
 
 - Balella, Franco Matías 
 
-- Integrante 2
+- Maidana, Federico
 
 - Integrante 3
 
